@@ -9,3 +9,6 @@ class TestBingo:
 
     def test_bingo(self):
         assert Bingo.bingo(self.sequence, [self.board1, self.board2, self.board3]) == 4512
+
+    def test_bingo_last_win(self):
+        assert Bingo.bingo_last_board(self.sequence, [self.board1, self.board2, self.board3]) == 1924

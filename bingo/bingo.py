@@ -17,6 +17,25 @@ class Bingo:
         return None
 
     @staticmethod
+    def bingo_last_board(sequence, boards):
+        winning_value = None
+        df = Bingo._init_boards(boards)
+        idx = pd.IndexSlice
+        for value in sequence:
+            if df.empty:
+                break
+            mask = df.loc[:, idx[:, "value"]] == value
+            df.loc[:, idx[:, "marked"]] = df.loc[:, idx[:, "marked"]] | mask.values
+            number_dropped = 0
+            while (winning_board := Bingo._winning_board(df)) is not None:
+                number_dropped += 1
+                board = df.loc(axis=1)[winning_board]
+                winning_value = Bingo._evaluate_board(board, value)
+                df.drop([winning_board], axis=1, inplace=True)
+                assert winning_board not in df.columns
+        return winning_value
+
+    @staticmethod
     def _init_boards(boards: list[list[int]]) -> pd.DataFrame:
         v_index = pd.MultiIndex.from_product([range(1, 6), range(1, 6)], names=["row", "column"])
         h_index = pd.MultiIndex.from_product([range(len(boards)), ["value", "marked"]], names=["board", "dim"])
@@ -30,12 +49,13 @@ class Bingo:
     @staticmethod
     def _winning_board(df):
         idx = pd.IndexSlice
+        if df.empty:
+            return None
         for i in range(1, 6):
             row_wins = df.loc[idx[idx[:, i], idx[:, 'marked']]].all()
             row_wins.index = row_wins.index.droplevel('dim')
             column_wins = df.loc[idx[idx[i, :], idx[:, 'marked']]].all()
             column_wins.index = column_wins.index.droplevel('dim')
-
             if row_wins.any():
                 return row_wins[row_wins].index[0]
 
@@ -45,7 +65,5 @@ class Bingo:
 
     @staticmethod
     def _evaluate_board(board, value):
-        print(board)
         score = value * board[board['marked'] == False]['value'].sum()
-        print(score)
         return score

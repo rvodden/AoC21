@@ -27,11 +27,10 @@ print(f"{len(boards)} boards have been loaded.")
 print(f"{len(sequence)} numbers are in the bingo readout.")
 
 for board in boards:
-    print(".", end="")
     if len(board) != 25:
         print()
         print(f"{board} is the wrong length")
         exit(255)
-print()
 
-print(Bingo.bingo(sequence, boards))
+# print(Bingo.bingo(sequence, boards))
+print(Bingo.bingo_last_board(sequence, boards))
