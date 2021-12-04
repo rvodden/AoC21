@@ -6,9 +6,9 @@ from sonar_sweep import SonarSweep
 
 
 class TestSonarSweep:
-
-    def test_count_increases(self, monkeypatch):
-        depths = [199,
+    def depths(self):
+        return pd.DataFrame(
+        [199,
                   200,
                   208,
                   210,
@@ -17,5 +17,10 @@ class TestSonarSweep:
                   240,
                   269,
                   260,
-                  263]
-        assert SonarSweep.count_increases(pd.DataFrame(depths)) == 7
+                  263])
+
+    def test_count_increases(self):
+        assert SonarSweep.count_increases(pd.DataFrame(self.depths())) == 7
+
+    def test_rolling_windows(self):
+        assert SonarSweep.count_increases(SonarSweep.rolling_windows(self.depths())) == 5
