@@ -1,10 +1,13 @@
 import io
-from sonar_sweep import sonar_sweep
+
+import pandas as pd
+
+from sonar_sweep import SonarSweep
 
 
 class TestSonarSweep:
 
-    def test_provided_example(self, monkeypatch):
+    def test_count_increases(self, monkeypatch):
         depths = [199,
                   200,
                   208,
@@ -15,4 +18,4 @@ class TestSonarSweep:
                   269,
                   260,
                   263]
-        assert sonar_sweep(depths) == 7
+        assert SonarSweep.count_increases(pd.DataFrame(depths)) == 7

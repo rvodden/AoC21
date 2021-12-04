@@ -1,8 +1,7 @@
-from sonar_sweep import sonar_sweep
-import fileinput
+import pandas as pd
+
+from sonar_sweep import SonarSweep
 
 
-depths = []
-for line in fileinput.input("input/day01.txt"):
-    depths.append(int(line))
-print(sonar_sweep(depths))
+depths = pd.read_csv("input/day01.txt")
+print(SonarSweep.count_increases(depths))

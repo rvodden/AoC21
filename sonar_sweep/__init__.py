@@ -1,3 +1,3 @@
-from .sonar_sweep import sonar_sweep
+from .sonar_sweep import SonarSweep
 
-__all__ = ["sonar_sweep"]
+__all__ = ["SonarSweep"]

@@ -1,12 +1,8 @@
+import pandas as pd
 
-def sonar_sweep(depths: list[int]):
-    prev = None
-    increases = 0
-    for current in depths:
-        if not prev:
-            prev = current
-            continue
 
-        increases += 1 if current > prev else 0
-        prev = current
-    return increases
+class SonarSweep:
+    @staticmethod
+    def count_increases(depths: pd.DataFrame):
+        diffs = depths.diff()
+        return diffs[diffs > 0].count()[0]
