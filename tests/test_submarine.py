@@ -19,3 +19,7 @@ class TestSubmarine:
     def test_calculate_position(self):
         df = self.instructions()
         assert Submarine.calculate_position(df) == 150
+
+    def test_calculate_position2(self):
+        df = self.instructions()
+        assert Submarine.calculate_position2(df) == 900

@@ -6,3 +6,4 @@ df = pd.read_table("input/day02.txt", header=None, names=['direction', 'distance
 df["direction"] = df["direction"].astype(pd.CategoricalDtype(["up", "down", "forward", "backward"], ordered=True))
 print(df)
 print(Submarine.calculate_position(df))
+print(Submarine.calculate_position2(df))
