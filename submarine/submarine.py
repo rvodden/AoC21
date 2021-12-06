@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+from itertools import product
 
 
 class Submarine:
@@ -35,7 +36,6 @@ class Submarine:
     @staticmethod
     def _convert_series_to_value(df):
         return int("".join(list(df)), 2)
-
 
     @staticmethod
     def calculate_gamma_rate(df: pd.DataFrame):
@@ -88,3 +88,4 @@ class Submarine:
     @staticmethod
     def calculate_life_support_rating(df):
         return Submarine.calculate_co2_scrubber_rating(df) * Submarine.calculate_oxygen_generator_rating(df)
+
