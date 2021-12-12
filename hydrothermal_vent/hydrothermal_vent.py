@@ -98,7 +98,7 @@ class HydrothermalVent:
         return new_df
 
     @staticmethod
-    def _line_intersection(x1: int, y1: int, x2: int, y2: int,
+    def _line_intersection2(x1: int, y1: int, x2: int, y2: int,
                            x3: pd.DataFrame, y3: pd.DataFrame, x4: pd.DataFrame, y4:pd.DataFrame) -> pd.DataFrame:
 
         if x1 == x2 and y1 == y2:
@@ -119,3 +119,7 @@ class HydrothermalVent:
 
         # bitwise operators look wrong here, but they're necessary for pandas to work
         return (0 <= uA) & (uA <= 1) & (0 <= uB) & (uB <= 1)
+
+    @staticmethod
+    def _line_intersection(x1: int, y1: int, x2: int, y2: int):
+        ...
