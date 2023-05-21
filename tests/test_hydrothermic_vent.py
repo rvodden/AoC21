@@ -1,106 +1,237 @@
-import pandas as pd
+import pytest
 
-from hydrothermal_vent import HydrothermalVent
-
-
-class TestHydrothermalVent:
-    def hydrothermal_vents(self):
-        return pd.DataFrame([[0, 9, 5, 9],
-                             [8, 0, 0, 8],
-                             [9, 4, 3, 4],
-                             [2, 2, 2, 1],
-                             [7, 0, 7, 4],
-                             [6, 4, 2, 0],
-                             [0, 9, 2, 9],
-                             [3, 4, 1, 4],
-                             [0, 0, 8, 8],
-                             [5, 5, 8, 2]], columns=["x1", "y1", "x2", "y2"])
-
-    def test_count_orthogonal_overlapping_vents(self):
-        df = self.hydrothermal_vents()
-        assert HydrothermalVent.calculate_orthogonal_overlapping_vents(df) == 5
-
-    def test_count_orthogonal_overlapping_vents_boundary_tests(self):
-        # df = pd.DataFrame([
-        #     [1, 1, 1, 1],
-        #     [1, 1, 1, 1]
-        # ], columns=["x1", "y1", "x2", "y2"])
-        # assert HydrothermalVent.calculate_orthogonal_overlapping_vents(df) == 1
-
-        df = pd.DataFrame([
-            [1, 1, 2, 1],
-            [1, 1, 2, 1]
-        ], columns=["x1", "y1", "x2", "y2"])
-        assert HydrothermalVent.calculate_orthogonal_overlapping_vents(df) == 2
-
-        # df = pd.DataFrame([
-        #     [1, 1, 5, 1],
-        #     [1, 1, 2, 1],
-        #     [4, 1, 5, 1]
-        # ], columns=["x1", "y1", "x2", "y2"])
-        # assert HydrothermalVent.calculate_orthogonal_overlapping_vents(df) == 4
+from hydrothermal_vent.hydrothermal_vent import (
+    Line,
+    Point,
+    get_number_of_points_which_have_two_or_more_lines_traversing_them,
+    smallest_power_of_two_minus_one_greater_than,
+    highest_power_of_two_less_than,
+    get_sub_regions,
+    get_bounds,
+    both_endpoints_in_region,
+    get_line_segment_in_region,
+    get_line_segments_in_region,
+    line_intersects_region,
+    select_horizontal_and_vertical_lines,
+)
 
 
-    def test_get_lines_which_intersect_rectangle(self):
-        df = pd.DataFrame([
-            [1, 1, 2, 1]
-        ], columns=["x1", "y1", "x2", "y2"])
-        assert len(HydrothermalVent._get_lines_which_intersect_rectangle(
-                df, 3, 1, 3, 1)) == 0
+@pytest.fixture
+def hydrothermal_vents() -> list[Line]:
+    return [
+        Line.from_coords(0, 9, 5, 9),
+        Line.from_coords(8, 0, 0, 8),
+        Line.from_coords(9, 4, 3, 4),
+        Line.from_coords(2, 2, 2, 1),
+        Line.from_coords(7, 0, 7, 4),
+        Line.from_coords(6, 4, 2, 0),
+        Line.from_coords(0, 9, 2, 9),
+        Line.from_coords(3, 4, 1, 4),
+        Line.from_coords(0, 0, 8, 8),
+        Line.from_coords(5, 5, 8, 2),
+    ]
 
-        df = pd.DataFrame([
-            [1, 1, 2, 1],
-            [1, 1, 5, 1]
-        ], columns=["x1", "y1", "x2", "y2"])
-        assert len(HydrothermalVent._get_lines_which_intersect_rectangle(
-            df, 2, 1, 2, 1)) == 2
 
-        df = pd.DataFrame([
-            [1, 1, 2, 1],
-            [1, 1, 2, 1]
-        ], columns=["x1", "y1", "x2", "y2"])
-        assert len(HydrothermalVent._get_lines_which_intersect_rectangle(
-            df, 1, 1, 1, 1)) == 2
+def test_get_number_of_points_which_have_two_or_more_lines_traversing_them(
+    hydrothermal_vents,
+):
+    assert (
+        get_number_of_points_which_have_two_or_more_lines_traversing_them(
+            select_horizontal_and_vertical_lines(hydrothermal_vents)
+        )
+        == 5
+    )
 
-        df = pd.DataFrame([
-            [1, 1, 2, 1],
-            [1, 1, 2, 1]
-        ], columns=["x1", "y1", "x2", "y2"])
-        assert len(HydrothermalVent._get_lines_which_intersect_rectangle(
-            df, 1, 1, 2, 1)) == 2
 
-    def test_line_intersesction(self):
-        df = pd.DataFrame([
-            [1, 1, 2, 1]
-        ], columns=["x1", "y1", "x2", "y2"])
-        assert not HydrothermalVent._line_intersection(
-            3, 1, 3, 1, df.x1, df.y1, df.x2, df.y2
-        ).any()
+def test_get_number_of_points_which_have_two_or_more_lines_traversing_them_part_2(
+    hydrothermal_vents,
+):
+    assert (
+        get_number_of_points_which_have_two_or_more_lines_traversing_them(
+            hydrothermal_vents
+        )
+        == 12
+    )
 
-        df = pd.DataFrame([
-            [1, 1, 3, 1]
-        ], columns=["x1", "y1", "x2", "y2"])
-        assert HydrothermalVent._line_intersection(
-            3, 1, 3, 1, df.x1, df.y1, df.x2, df.y2
-        ).any()
 
-        df = pd.DataFrame([
-            [1, 1, 2, 1]
-        ], columns=["x1", "y1", "x2", "y2"])
-        assert HydrothermalVent._line_intersection(
-            2, 1, 2, 1, df.x1, df.y1, df.x2, df.y2
-        ).any()
+def test_get_bounds(hydrothermal_vents: list[Line]):
+    assert get_bounds(hydrothermal_vents) == (Point(0, 0), Point(15, 15))
 
-        df = pd.DataFrame([
-            [1, 1, 2, 1]
-        ], columns=["x1", "y1", "x2", "y2"])
-        assert HydrothermalVent._line_intersection(
-            1, 1, 1, 1, df.x1, df.y1, df.x2, df.y2
-        ).any()
 
-        df = pd.DataFrame([
-            [1, 1, 5, 1]
-        ], columns=["x1", "y1", "x2", "y2"])
-        assert HydrothermalVent._line_intersection(
-            2, 1, 2, 1, df.x1, df.y1, df.x2, df.y2
-        ).any()
+@pytest.mark.parametrize("value,expected", [(3, 3), (2, 3), (4, 7), (17, 31)])
+def test_smallest_power_of_two_minus_one_greater_than(value, expected) -> None:
+    assert smallest_power_of_two_minus_one_greater_than(value) == expected
+
+
+def test_highest_power_of_two_less_than() -> None:
+    assert highest_power_of_two_less_than(4) == 4
+    assert highest_power_of_two_less_than(3) == 2
+
+
+def test_get_sub_regions():
+    assert get_sub_regions((Point(0, 0), Point(7, 7))) == [
+        (Point(0, 0), Point(3, 3)),
+        (Point(0, 4), Point(3, 7)),
+        (Point(4, 0), Point(7, 3)),
+        (Point(4, 4), Point(7, 7)),
+    ]
+
+
+@pytest.mark.parametrize(
+    "region,line,expected",
+    [
+        ((Point(2, 2), Point(6, 6)), Line(Point(1, 1), Point(3, 3)), False),
+        ((Point(2, 2), Point(6, 6)), Line(Point(4, 4), Point(8, 8)), False),
+        ((Point(2, 2), Point(6, 6)), Line(Point(2, 2), Point(5, 5)), True),
+        ((Point(2, 2), Point(6, 6)), Line(Point(3, 3), Point(5, 5)), True),
+        ((Point(2, 2), Point(6, 6)), Line(Point(1, 1), Point(5, 5)), False),
+        ((Point(2, 2), Point(6, 6)), Line(Point(6, 6), Point(8, 8)), False),
+        ((Point(2, 2), Point(6, 6)), Line(Point(0, 0), Point(9, 9)), False),
+        ((Point(0, 0), Point(9, 9)), Line.from_coords(9, 4, 3, 4), True),
+    ],
+)
+def test_both_endpoints_in_region(
+    region: tuple[Point, Point], line: Line, expected: bool
+):
+    assert both_endpoints_in_region(region, line) == expected
+
+
+@pytest.mark.parametrize(
+    "region,line,expected",
+    [
+        ((Point(2, 2), Point(6, 6)), Line(Point(1, 1), Point(3, 3)), True),
+        ((Point(2, 2), Point(6, 6)), Line(Point(4, 4), Point(8, 8)), True),
+        ((Point(2, 2), Point(6, 6)), Line(Point(2, 2), Point(5, 5)), True),
+        ((Point(2, 2), Point(6, 6)), Line(Point(3, 3), Point(5, 5)), True),
+        ((Point(2, 2), Point(6, 6)), Line(Point(1, 1), Point(5, 5)), True),
+        ((Point(2, 2), Point(6, 6)), Line(Point(6, 6), Point(8, 8)), True),
+        ((Point(2, 2), Point(6, 6)), Line(Point(0, 0), Point(9, 9)), True),
+        ((Point(2, 1), Point(2, 1)), Line(Point(2, 1), Point(2, 2)), True),
+        ((Point(7, 4), Point(7, 4)), Line.from_coords(9, 4, 3, 4), True),
+        ((Point(7, 4), Point(7, 4)), Line.from_coords(3, 4, 9, 4), True),
+    ],
+)
+def test_line_intersects_region(
+    region: tuple[Point, Point], line: Line, expected: bool
+):
+    assert line_intersects_region(region, line) == expected
+
+
+test_get_line_segment_in_region_data = [
+    (
+        (Point(2, 2), Point(6, 6)),
+        Line(Point(1, 1), Point(3, 3)),
+        Line(Point(2, 2), Point(3, 3)),
+    ),
+    (
+        (Point(2, 2), Point(6, 6)),
+        Line(Point(4, 4), Point(8, 8)),
+        Line(Point(4, 4), Point(6, 6)),
+    ),
+    (
+        (Point(2, 2), Point(6, 6)),
+        Line(Point(2, 2), Point(5, 5)),
+        Line(Point(2, 2), Point(5, 5)),
+    ),
+    (
+        (Point(2, 2), Point(6, 6)),
+        Line(Point(3, 3), Point(5, 5)),
+        Line(Point(3, 3), Point(5, 5)),
+    ),
+    (
+        (Point(2, 2), Point(6, 6)),
+        Line(Point(1, 1), Point(5, 5)),
+        Line(Point(2, 2), Point(5, 5)),
+    ),
+    (
+        (Point(2, 2), Point(6, 6)),
+        Line(Point(6, 6), Point(8, 8)),
+        Line(Point(6, 6), Point(6, 6)),
+    ),
+    (
+        (Point(2, 2), Point(6, 6)),
+        Line(Point(0, 0), Point(9, 9)),
+        Line(Point(2, 2), Point(6, 6)),
+    ),
+    (
+        (Point(2, 1), Point(2, 1)),
+        Line(Point(2, 1), Point(2, 2)),
+        Line(Point(2, 1), Point(2, 1)),
+    ),
+    (
+        (Point(2, 2), Point(6, 6)),
+        Line(Point(0, 0), Point(9, 9)),
+        Line(Point(2, 2), Point(6, 6)),
+    ),
+    (
+        (Point(2, 2), Point(6, 6)),
+        Line(Point(0, 9), Point(9, 0)),
+        Line(Point(3, 6), Point(6, 3)),
+    ),
+    (
+        (Point(2, 2), Point(6, 6)),
+        Line(Point(5, 0), Point(5, 9)),
+        Line(Point(5, 2), Point(5, 6)),
+    ),
+    (
+        (Point(2, 2), Point(6, 6)),
+        Line(Point(0, 5), Point(9, 5)),
+        Line(Point(2, 5), Point(6, 5)),
+    ),
+    (
+        (Point(0, 0), Point(7, 7)),
+        Line(start=Point(x=8, y=0), end=Point(x=0, y=8)),
+        Line(start=Point(x=7, y=1), end=Point(x=1, y=7)),
+    ),
+    (
+        (Point(0, 0), Point(3, 3)),
+        Line(start=Point(x=6, y=4), end=Point(x=2, y=0)),
+        Line(start=Point(x=3, y=1), end=Point(x=2, y=0)),
+    ),
+    (
+        (Point(0, 0), Point(3, 3)),
+        Line(start=Point(x=2, y=0), end=Point(x=6, y=4)),
+        Line(start=Point(x=2, y=0), end=Point(x=3, y=1)),
+    ),
+]
+
+
+@pytest.mark.parametrize("region,line,expected", test_get_line_segment_in_region_data)
+def test_get_line_segment_in_region(
+    region: tuple[Point, Point], line: Line, expected: Line
+):
+    assert get_line_segment_in_region(region, line) == expected
+
+
+@pytest.mark.parametrize(
+    "region, lines, expected",
+    [
+        (
+            (Point(2, 2), Point(6, 6)),
+            [
+                Line(Point(1, 1), Point(3, 3)),
+                Line(Point(4, 4), Point(8, 8)),
+                Line(Point(2, 2), Point(5, 5)),
+                Line(Point(1, 1), Point(5, 5)),
+                Line(Point(6, 6), Point(8, 8)),
+                Line(Point(0, 0), Point(9, 9)),
+                Line(Point(7, 7), Point(10, 10)),
+            ],
+            [
+                Line(Point(2, 2), Point(3, 3)),
+                Line(Point(4, 4), Point(6, 6)),
+                Line(Point(2, 2), Point(5, 5)),
+                Line(Point(2, 2), Point(5, 5)),
+                Line(Point(6, 6), Point(6, 6)),
+                Line(Point(2, 2), Point(6, 6)),
+            ],
+        ),
+    ],
+)
+def test_get_line_segments_in_region(region, lines, expected):
+    result = get_line_segments_in_region(region, lines)
+    assert len(result) == len(expected)
+    for r in result:
+        assert r in expected
+    for e in expected:
+        assert e in result

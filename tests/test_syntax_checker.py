@@ -1,5 +1,6 @@
 from syntax_checker import SyntaxChecker
 
+
 class TestSyntaxChecker:
     def test_syntax_checker(self):
         test_data = [

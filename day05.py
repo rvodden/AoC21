@@ -1,15 +1,18 @@
 import fileinput
 
-import pandas as pd
-
-from hydrothermal_vent import HydrothermalVent
-
-
-def gen():
-    for line in fileinput.input("input/day05.txt"):
-        new_line = line.replace(' -> ', ',')
-        yield tuple(map(int, new_line.strip().split(',')))
+from hydrothermal_vent import (
+    Line,
+    get_number_of_points_which_have_two_or_more_lines_traversing_them,
+    select_horizontal_and_vertical_lines,
+)
 
 
-df = pd.DataFrame(gen(), columns=['x1', 'y1', 'x2', 'y2'])
-print(HydrothermalVent.calculate_orthogonal_overlapping_vents(df))
+lines = []
+for line in fileinput.input("input/day05.txt"):
+    new_line = line.replace(" -> ", ",")
+    coord = map(int, new_line.strip().split(","))
+    lines.append(Line.from_coords(*coord))
+
+
+result = get_number_of_points_which_have_two_or_more_lines_traversing_them(lines)
+print(result)
