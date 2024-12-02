@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from typing import Self
 
+
 @dataclass(frozen=True)
 class Cuboid:
     x: tuple[int, int]
@@ -31,7 +32,7 @@ class Step:
     cuboid: Cuboid
 
 
-def parse_step(text: str) -> Step | None:
+def parse_step(text: str, part1: bool = True) -> Step | None:
     # on x=10..12,y=10..12,z=10..12
     state, cuboid = text.split(" ")
     state = state == "on"
@@ -39,9 +40,10 @@ def parse_step(text: str) -> Step | None:
         tuple([int(num) for num in range.split("=")[1].split("..")])
         for range in cuboid.split(",")
     ]
-    for x, y in ranges:
-        if x < -50 or x > 50 or y < -50 or y > 50:
-            return None
+    if part1:
+        for x, y in ranges:
+            if x < -50 or x > 50 or y < -50 or y > 50:
+                return None
     return Step(state, Cuboid(*ranges))
 
 
@@ -51,30 +53,40 @@ class Grid:
         self._subtractive_cuboids = []
 
     def add_cuboid(self, cuboid: Cuboid):
+        new_adds = []
+        new_subs = []
         for additive_cuboid in self._additive_cuboids:
             if overlap := additive_cuboid.overlap(cuboid):
-                self._subtractive_cuboids.append(overlap)
-        self._additive_cuboids.append(cuboid)
+                new_subs.append(overlap)
+
+        for subtracive_cuboid in self._subtractive_cuboids:
+            if overlap := subtracive_cuboid.overlap(cuboid):
+                new_adds.append(overlap)
         
+        new_adds.append(cuboid)
+        self._additive_cuboids.extend(new_adds)
+        self._subtractive_cuboids.extend(new_subs)
+
     def subtract_cuboid(self, cuboid: Cuboid):
         new_subs = []
         for additive_cuboid in self._additive_cuboids:
             if overlap := additive_cuboid.overlap(cuboid):
                 new_subs.append(overlap)
-                
+
+        new_adds = []
         for subtractive_cuboid in self._subtractive_cuboids:
             if overlap := subtractive_cuboid.overlap(cuboid):
-                self._additive_cuboids.append(overlap)
-                
+                new_adds.append(overlap)
+
         self._subtractive_cuboids.extend(new_subs)
+        self._additive_cuboids.extend(new_adds)
 
     def on_cubes(self) -> int:
         result = 0
         for additive_cuboid in self._additive_cuboids:
             result += additive_cuboid.volume()
-            
+
         for subtractive_cuboid in self._subtractive_cuboids:
             result -= subtractive_cuboid.volume()
-            
-        return result
 
+        return result
