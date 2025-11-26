@@ -1,0 +1,35 @@
+{
+    "name": "Python",
+
+    "build": {
+        "dockerfile": "Dockerfile",
+        "args": { "VARIANT": "3.12" }
+    },
+    "features": {
+        "ghcr.io/devcontainers/features/common-utils:2":{
+            "username": "vscode",
+            "userUid": "1000",
+            "userGid": "1000"
+        },
+        "ghcr.io/devcontainers/features/python:1": "none",
+        "ghcr.io/devcontainers/features/node:1": "none",
+        "ghcr.io/devcontainers/features/git:1": {
+            "version": "latest",
+            "ppa": "false"
+        }
+    },
+
+    "customizations": {
+        "vscode": {
+            "settings": {
+                "python.defaultInterpreterPath": "/usr/local/bin/python"
+            },
+            "extensions": [
+                "ms-python.python",
+                "ms-azuretools.vscode-docker"
+            ]
+        }
+    },
+
+    "remoteUser": "vscode"
+}

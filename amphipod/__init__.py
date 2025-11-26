@@ -1,3 +1,2 @@
-from ._amphipod import Amphipod, Burrow
+from ._amphipod import *
 
-__all__ = ["Amphipod", "Burrow"]
